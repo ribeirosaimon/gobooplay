@@ -6,5 +6,6 @@ import (
 )
 
 func CreateConfigRouter(e *gin.Engine) {
-	account.RouteAccount(e)
+	version := e.Group("/v1")
+	account.RouteAccount(version)
 }

@@ -13,7 +13,7 @@ const (
 type gender int
 
 type Account struct {
-	Id                 primitive.ObjectID `json:"id" bson:"_id"`
+	ID                 primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	Name               string             `json:"name" bson:"name"`
 	Password           string             `json:"password" bson:"password"`
 	FamilyName         string             `json:"familyName" bson:"familyName"`
@@ -26,4 +26,23 @@ type Account struct {
 	LoginCount         uint32             `json:"login_count" bson:"loginCount"`
 	CreatedAt          time.Time          `json:"createdAt" bson:"createdAt"`
 	UpdatedAt          time.Time          `json:"updatedAt" bson:"updatedAt"`
+}
+
+type AccountDTO struct {
+	Login      string `json:"login"`
+	Password   string `json:"password"`
+	Name       string `json:"name"`
+	FamilyName string `json:"familyName"`
+	Gender     gender `json:"gender"`
+}
+
+type LoginDTO struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
+type LoggedUser struct {
+	Login  string   `json:"username"`
+	UserId string   `json:"userId"`
+	Role   []string `json:"role"`
 }

@@ -7,7 +7,6 @@ import (
 
 func main() {
 	r := gin.Default()
-
 	routers.CreateConfigRouter(r)
 
 	r.Run()
