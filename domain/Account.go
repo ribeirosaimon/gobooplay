@@ -46,3 +46,12 @@ type LoggedUser struct {
 	UserId string   `json:"userId"`
 	Role   []string `json:"role"`
 }
+
+type UserAccessToken struct {
+	Token string `json:"access_token"`
+}
+
+func (a AccountDTO) cleanPassword() AccountDTO {
+	a.Password = ""
+	return a
+}
