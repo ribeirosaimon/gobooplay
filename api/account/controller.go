@@ -37,7 +37,7 @@ func (s accountController) signUp(c *gin.Context) {
 	return
 }
 
-func (s accountController) signIn(c *gin.Context) {
+func (s accountController) login(c *gin.Context) {
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Millisecond*80)
 	defer cancelFunc()
 
@@ -47,5 +47,4 @@ func (s accountController) signIn(c *gin.Context) {
 		return
 	}
 	s.service.login(ctx, login)
-
 }

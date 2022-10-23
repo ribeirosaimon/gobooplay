@@ -7,6 +7,6 @@ import (
 func RouteAccount(e *gin.RouterGroup) {
 	group := e.Group("/account")
 	group.POST("/signup", controller().signUp)
-	group.POST("/signin", controller().signIn)
+	group.POST("/login", controller().login)
 
 }

@@ -38,10 +38,22 @@ func (s accountService) saveAccount(ctx context.Context, dto domain.AccountDTO) 
 	return dto, nil
 }
 
-func (s accountService) login(ctx context.Context, login domain.LoginDTO) {
+func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domain.UserAccessToken, error) {
+	var acessToken = domain.UserAccessToken{}
+
 	account, err := s.repository.FindAccountByLogin(ctx, login.Login)
 	if err != nil {
-		return
+		return acessToken, err
 	}
 
+	if err := security.VerifyPassword(account.Password, login.Password); err != nil {
+		return acessToken, err
+	}
+
+	token, err := security.CreateToken(account)
+	if err != nil {
+		return acessToken, err
+	}
+	acessToken.Token = token
+	return acessToken, nil
 }
