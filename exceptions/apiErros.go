@@ -1,7 +1,6 @@
 package exceptions
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -12,6 +11,5 @@ type HttpResponse struct {
 }
 
 func ValidateException(c *gin.Context, msg string, status int) {
-	c.Error(errors.New(msg))
-	c.JSON(status, HttpResponse{Message: msg, Timestamp: time.Now()})
+	c.AbortWithStatusJSON(status, HttpResponse{Message: msg, Timestamp: time.Now()})
 }

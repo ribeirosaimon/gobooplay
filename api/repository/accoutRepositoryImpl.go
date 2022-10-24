@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"ribeirosaimon/gobooplay/api/repository/mongoInterface"
 	"ribeirosaimon/gobooplay/config"
 	"ribeirosaimon/gobooplay/domain"
 	"time"
@@ -16,11 +17,11 @@ type Account struct {
 	database *mongo.Collection
 }
 
-func NewAccountRepository() Account {
+func NewAccountRepository() mongoInterface.Account {
 	return Account{database: config.DbConnection(collectionAccount)}
 }
 
-func (conn Account) SaveAccount(context context.Context, account *domain.Account) (domain.Account, error) {
+func (conn Account) Save(context context.Context, account *domain.Account) (domain.Account, error) {
 	existUser := conn.ExistUserWithLogin(context, account.Login)
 	if existUser {
 		update := bson.D{
@@ -58,7 +59,7 @@ func (conn Account) SaveAccount(context context.Context, account *domain.Account
 	return domain.Account{}, nil
 }
 
-func (conn Account) FindAccountById(context context.Context, id string) (domain.Account, error) {
+func (conn Account) FindById(context context.Context, id string) (domain.Account, error) {
 	var account domain.Account
 
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -85,6 +86,11 @@ func (conn Account) FindAccountByLogin(context context.Context, login string) (d
 	}
 
 	return account, nil
+}
+
+func (conn Account) DelebeById(ctx context.Context, s string) error {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (conn Account) ExistUserWithLogin(ctx context.Context, login string) bool {

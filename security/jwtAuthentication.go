@@ -45,7 +45,7 @@ func ValidationToken(token string) (domain.LoggedUser, error) {
 	if ok && parseToken.Valid {
 		userId := claims["userId"]
 		rep := repository.NewAccountRepository()
-		userDb, err := rep.FindAccountById(ctx, fmt.Sprint(userId))
+		userDb, err := rep.FindById(ctx, fmt.Sprint(userId))
 		if err != nil {
 			return domain.LoggedUser{}, err
 		}

@@ -1,0 +1,97 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/account/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Login",
+                "operationId": "login",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.UserAccessToken"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/exceptions.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/books": {
+            "get": {
+                "description": "Sign Up account.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "signUp"
+                ],
+                "summary": "sign Up accounts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.AccountDTO"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.AccountDTO": {
+            "type": "object",
+            "properties": {
+                "familyName": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "gender": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "login": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "password example:": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UserAccessToken": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "1"
+                }
+            }
+        },
+        "exceptions.HttpResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

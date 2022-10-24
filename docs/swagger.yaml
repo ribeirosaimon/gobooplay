@@ -1,0 +1,63 @@
+definitions:
+  domain.AccountDTO:
+    properties:
+      familyName:
+        example: "1"
+        type: string
+      gender:
+        example: 1
+        type: integer
+      login:
+        example: "1"
+        type: string
+      name:
+        example: "1"
+        type: string
+      'password example:':
+        type: string
+    type: object
+  domain.UserAccessToken:
+    properties:
+      access_token:
+        example: "1"
+        type: string
+    type: object
+  exceptions.HttpResponse:
+    properties:
+      message:
+        type: string
+      timestamp:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /account/login:
+    post:
+      operationId: login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.UserAccessToken'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/exceptions.HttpResponse'
+      summary: Login
+  /books:
+    get:
+      description: Sign Up account.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.AccountDTO'
+      summary: sign Up accounts
+      tags:
+      - signUp
+swagger: "2.0"

@@ -40,7 +40,7 @@ func (s accountService) saveAccountService(ctx context.Context, dto domain.Accou
 
 	newAccount.Password = string(encriptedPassword)
 
-	_, err = s.repository.SaveAccount(context.Background(), &newAccount)
+	_, err = s.repository.Save(context.Background(), &newAccount)
 	if err != nil {
 		return domain.AccountDTO{}, err
 	}
@@ -67,7 +67,7 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 	if err := security.VerifyPassword(account.Password, login.Password); err != nil {
 		account.LastLoginAttemp = currentTime
 		account.PasswordErrorCount += 1
-		_, err := s.repository.SaveAccount(ctx, &account)
+		_, err := s.repository.Save(ctx, &account)
 		if err != nil {
 			return acessToken, err
 		}
@@ -78,7 +78,7 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 	account.LoginCount += 1
 	account.LastLogin = currentTime
 
-	s.repository.SaveAccount(ctx, &account)
+	s.repository.Save(ctx, &account)
 
 	token, err := security.CreateToken(account)
 	if err != nil {
