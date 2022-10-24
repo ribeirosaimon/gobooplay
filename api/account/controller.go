@@ -18,6 +18,13 @@ func controller() accountController {
 	return accountController{service: service()}
 }
 
+// signUp             godoc
+// @Summary      sign Up accounts
+// @Description  Sign Up account.
+// @Tags         signUp
+// @Produce      json
+// @Success      200  {object}  domain.AccountDTO
+// @Router       /books [get]
 func (s accountController) signUp(c *gin.Context) {
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Millisecond*80)
 	defer cancelFunc()
@@ -37,6 +44,13 @@ func (s accountController) signUp(c *gin.Context) {
 	return
 }
 
+// login godoc
+// @Summary Login
+// @ID      login
+// @Produce json
+// @Success 200 {object} domain.UserAccessToken
+// @Failure 409 {object} exceptions.HttpResponse
+// @Router  /account/login [POST]
 func (s accountController) login(c *gin.Context) {
 
 	var login domain.LoginDTO
