@@ -8,6 +8,8 @@ import (
 const (
 	MALE gender = iota
 	FEMALE
+	ADMIN = "ADMIN"
+	USER  = "USER"
 )
 
 type gender int
