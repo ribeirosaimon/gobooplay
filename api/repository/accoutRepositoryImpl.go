@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -89,8 +90,17 @@ func (conn Account) FindAccountByLogin(context context.Context, login string) (d
 }
 
 func (conn Account) DelebeById(ctx context.Context, s string) error {
-	//TODO implement me
-	panic("implement me")
+	exists := conn.ExistUserWithLogin(ctx, s)
+
+	filter := bson.D{{"_id", s}}
+	if !exists {
+		return errors.New("this account do not exists")
+	}
+	one, err := conn.database.DeleteOne(ctx, filter)
+	if err != nil || one.DeletedCount != 1 {
+		return err
+	}
+	return nil
 }
 
 func (conn Account) ExistUserWithLogin(ctx context.Context, login string) bool {
