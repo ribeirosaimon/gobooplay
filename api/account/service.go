@@ -5,13 +5,14 @@ import (
 	"errors"
 	"log"
 	"ribeirosaimon/gobooplay/api/repository"
+	"ribeirosaimon/gobooplay/api/repository/mongoInterface"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/security"
 	"time"
 )
 
 type accountService struct {
-	repository repository.Account
+	repository mongoInterface.Account
 }
 
 func service() accountService {
