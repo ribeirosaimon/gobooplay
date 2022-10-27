@@ -1,7 +1,9 @@
 package mongoInterface
 
-import "context"
+import (
+	"context"
+)
 
-type MongoTemplate interface {
-	findById(context.Context, string, interface{}) (interface{}, error)
+type GenericMongoTemplate[T any] interface {
+	findById(context.Context, string) (T, error)
 }
