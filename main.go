@@ -8,10 +8,11 @@ import (
 )
 
 func main() {
-	value := "6356062d9f3ea305167062ba"
-	id, err := repository.NewMongoTemplateRepository(domain.Account{}).FindById(context.Background(), value)
+	meuTeste := domain.Account{Name: "Meu teste"}
+	id, err := repository.MongoTemplate[domain.Account]().Save(context.Background(), meuTeste)
+
 	if err != nil {
-		panic(err)
+		fmt.Println(err.Error())
 	}
 	fmt.Println(id)
 
