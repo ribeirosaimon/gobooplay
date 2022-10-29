@@ -1,24 +1,15 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"ribeirosaimon/gobooplay/api/repository"
-	"ribeirosaimon/gobooplay/domain"
+	"github.com/gin-gonic/gin"
+	"ribeirosaimon/gobooplay/routers"
 )
 
 func main() {
-	meuTeste := domain.Account{Name: "Meu teste"}
-	id, err := repository.MongoTemplate[domain.Account]().Save(context.Background(), meuTeste)
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	fmt.Println(id)
+	r := gin.Default()
 
-	//r := gin.Default()
-	//
-	//routers.CreateConfigRouter(r)
-	//
-	//r.Run(":8080")
+	routers.CreateConfigRouter(r)
+
+	r.Run(":8080")
 }

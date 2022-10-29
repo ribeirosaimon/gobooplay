@@ -22,6 +22,7 @@ func Authorization(roles []string) gin.HandlerFunc {
 		}
 		authorization := contains(roles, loggedUser.Role)
 		if !authorization {
+			exceptions.ValidateException(c, "you not authorizated", http.StatusConflict)
 			return
 		}
 		c.Set("loggedUser", loggedUser)

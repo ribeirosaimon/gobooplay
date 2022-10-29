@@ -8,8 +8,9 @@ import (
 const (
 	MALE gender = iota
 	FEMALE
-	ADMIN = "ADMIN"
-	USER  = "USER"
+	GENERAL_ADMIN = "GENERAL_ADMIN"
+	ADMIN         = "ADMIN"
+	USER          = "USER"
 )
 
 type gender int
@@ -44,9 +45,9 @@ type LoginDTO struct {
 }
 
 type LoggedUser struct {
-	Login  string   `json:"username"`
-	UserId string   `json:"userId"`
-	Role   []string `json:"role"`
+	Login  string   `json:"username" bson:"username"`
+	UserId string   `json:"userId" bson:"userId"`
+	Role   []string `json:"role" bson:"role"`
 }
 
 type UserAccessToken struct {

@@ -9,5 +9,5 @@ import (
 func CreateConfigRouter(e *gin.Engine) {
 	version := e.Group("api/v1")
 	account.RouteAccount(version)
-	product.ProductRoute(version)
+	product.RouteProduct(version)
 }
