@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ribeirosaimon/gobooplay/api/repository"
@@ -78,4 +79,38 @@ func (s productService) DeleteProductById(ctx context.Context, id string, user d
 		return err
 	}
 	return nil
+}
+
+func (s productService) UpdateProduct(c *gin.Context, payload domain.ProductDTO, id string, user domain.LoggedUser) (domain.Product, error) {
+	product, err := s.productRepository.FindById(c, id)
+	if err != nil {
+		return domain.Product{}, err
+	}
+	if product.UpdateBy.UserId != user.UserId {
+		return domain.Product{}, errors.New("you not permission")
+	}
+
+	var filterBson = bson.D{}
+	if payload.Name != "" {
+		filterBson = append(filterBson, bson.E{Key: "name", Value: payload.Name})
+	}
+
+	if payload.Price != "" {
+		priceDecimal, err := primitive.ParseDecimal128(payload.Price)
+
+		if err != nil {
+			return domain.Product{}, err
+		}
+		filterBson = append(filterBson, bson.E{Key: "price", Value: priceDecimal})
+	}
+
+	if payload.SubscriptionTime != 0 {
+		filterBson = append(filterBson, bson.E{Key: "subscriptionTime", Value: payload.SubscriptionTime})
+	}
+
+	response, err := s.productRepository.UpdateById(c, id, filterBson)
+	if err != nil {
+		return domain.Product{}, err
+	}
+	return response, nil
 }

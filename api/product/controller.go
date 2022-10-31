@@ -55,6 +55,24 @@ func (p controllerProduct) DeleteProduct(c *gin.Context) {
 	}
 }
 
+func (p controllerProduct) UpdateProduct(c *gin.Context) {
+	user := getUser(c)
+	productId := c.Param("productId")
+
+	var payload domain.ProductDTO
+	if err := json.NewDecoder(c.Request.Body).Decode(&payload); err != nil {
+		exceptions.ValidateException(c, "incorrect body", http.StatusConflict)
+		return
+	}
+	product, err := p.service.UpdateProduct(c, payload, productId, user)
+	if err != nil {
+		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
+		return
+	}
+	c.JSON(http.StatusCreated, product)
+	return
+}
+
 func getUser(c *gin.Context) domain.LoggedUser {
 	loggedUser, _ := c.Get("loggedUser")
 	return loggedUser.(domain.LoggedUser)

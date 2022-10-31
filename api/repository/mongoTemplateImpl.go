@@ -77,44 +77,34 @@ func (m MongoTemplateStruct[T]) UpdateById(ctx context.Context, id string, filte
 			return m.myInterface, errors.New("id canot be changed")
 		}
 	}
-	haveValue, err := m.CountDocument(ctx, filter)
+	idReturned, err := m.ExistAndReturnId(ctx, id)
 	if err != nil {
-		return m.myInterface, err
-	}
-	if !haveValue {
 		return m.myInterface, errors.New("this document not exist")
 	}
+
 	update := bson.D{{"$set", filter}}
 
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return m.myInterface, err
-	}
+	updatedValue, err := m.database.UpdateOne(ctx, bson.D{{"_id", idReturned}}, update)
 
-	updatedValue, err := m.database.UpdateByID(ctx, objectId, update)
-
-	if updatedValue.ModifiedCount != 1 {
+	if err != nil || updatedValue.MatchedCount == 0 {
 		return m.myInterface, errors.New("something is wrong")
 	}
-	dbUpdated, err := m.FindById(ctx, objectId.String())
+	dbUpdated, err := m.FindById(ctx, idReturned.Hex())
 	if err != nil {
 		return m.myInterface, err
 	}
 	return dbUpdated, nil
 }
 func (m MongoTemplateStruct[T]) DeleteById(ctx context.Context, id string) error {
-	objectId, err := primitive.ObjectIDFromHex(id)
+	idReturned, err := m.ExistAndReturnId(ctx, id)
+
 	if err != nil {
-		return err
+		return errors.New("this document does not exists")
 	}
 
-	filter := bson.D{{"_id", objectId}}
+	filter := bson.D{{"_id", idReturned}}
 
-	document, err := m.CountDocument(ctx, filter)
-	if err != nil {
-		return err
-	}
-	one, err := m.database.DeleteOne(ctx, document)
+	one, err := m.database.DeleteOne(ctx, filter)
 	if err != nil || one.DeletedCount != 1 {
 		return err
 	}
@@ -122,10 +112,15 @@ func (m MongoTemplateStruct[T]) DeleteById(ctx context.Context, id string) error
 
 }
 
-func (m MongoTemplateStruct[T]) CountDocument(ctx context.Context, filter bson.D) (bool, error) {
+func (m MongoTemplateStruct[T]) ExistAndReturnId(ctx context.Context, id string) (primitive.ObjectID, error) {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return primitive.ObjectID{}, err
+	}
+	filter := bson.D{{"_id", objectId}}
 	documents, err := m.database.CountDocuments(ctx, filter)
 	if err != nil || documents != 1 {
-		return false, err
+		return primitive.ObjectID{}, err
 	}
-	return true, nil
+	return objectId, nil
 }
