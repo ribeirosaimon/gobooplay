@@ -6,8 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"ribeirosaimon/gobooplay/api/repository"
 	"ribeirosaimon/gobooplay/domain"
+	"ribeirosaimon/gobooplay/repository"
+	"ribeirosaimon/gobooplay/util"
 	"time"
 )
 
@@ -44,9 +45,15 @@ func (s productService) AddProduct(ctx context.Context, payload domain.ProductDT
 }
 
 func (s productService) FindAllProduct(ctx context.Context, user domain.LoggedUser) ([]domain.ProductDTO, error) {
-	filter := bson.D{
-		{"updateBy.userId", user.UserId},
+	var filter bson.D
+	if util.ContainsRole[string](user.Role, domain.ADMIN) {
+		filter = bson.D{
+			{"updateBy.userId", user.UserId},
+		}
+	} else {
+		filter = bson.D{{}}
 	}
+
 	find, err := s.productRepository.Find(ctx, filter)
 	if err != nil {
 		return []domain.ProductDTO{}, nil
@@ -107,6 +114,7 @@ func (s productService) UpdateProduct(c *gin.Context, payload domain.ProductDTO,
 	if payload.SubscriptionTime != 0 {
 		filterBson = append(filterBson, bson.E{Key: "subscriptionTime", Value: payload.SubscriptionTime})
 	}
+	filterBson = append(filterBson, bson.E{Key: "updatedAt", Value: time.Now()})
 
 	response, err := s.productRepository.UpdateById(c, id, filterBson)
 	if err != nil {

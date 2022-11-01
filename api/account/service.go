@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"log"
-	"ribeirosaimon/gobooplay/api/repository"
-	"ribeirosaimon/gobooplay/api/repository/mongoInterface"
 	"ribeirosaimon/gobooplay/domain"
+	"ribeirosaimon/gobooplay/repository"
+	"ribeirosaimon/gobooplay/repository/mongoInterface"
 	"ribeirosaimon/gobooplay/security"
 	"time"
 )

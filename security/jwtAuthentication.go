@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"log"
-	"ribeirosaimon/gobooplay/api/repository"
 	"ribeirosaimon/gobooplay/domain"
+	"ribeirosaimon/gobooplay/repository"
 	"time"
 )
 

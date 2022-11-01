@@ -53,6 +53,7 @@ func (m MongoTemplateStruct[T]) Find(ctx context.Context, filter bson.D) ([]T, e
 
 		m.listOfInterface = append(m.listOfInterface, m.myInterface)
 	}
+
 	return m.listOfInterface, nil
 }
 

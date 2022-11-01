@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/exceptions"
+	"ribeirosaimon/gobooplay/util"
 )
 
 type controllerProduct struct {
@@ -19,7 +20,7 @@ func ControllerProduct() controllerProduct {
 }
 
 func (p controllerProduct) SaveProduct(c *gin.Context) {
-	user := getUser(c)
+	user := util.GetUser(c)
 
 	var payload domain.ProductDTO
 	if err := json.NewDecoder(c.Request.Body).Decode(&payload); err != nil {
@@ -36,7 +37,7 @@ func (p controllerProduct) SaveProduct(c *gin.Context) {
 }
 
 func (p controllerProduct) FindAvailableProduct(c *gin.Context) {
-	user := getUser(c)
+	user := util.GetUser(c)
 	allProduct, err := p.service.FindAllProduct(c, user)
 	if err != nil {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
@@ -47,7 +48,7 @@ func (p controllerProduct) FindAvailableProduct(c *gin.Context) {
 }
 
 func (p controllerProduct) DeleteProduct(c *gin.Context) {
-	user := getUser(c)
+	user := util.GetUser(c)
 	productId := c.Param("productId")
 	if err := p.service.DeleteProductById(c, productId, user); err != nil {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
@@ -56,7 +57,7 @@ func (p controllerProduct) DeleteProduct(c *gin.Context) {
 }
 
 func (p controllerProduct) UpdateProduct(c *gin.Context) {
-	user := getUser(c)
+	user := util.GetUser(c)
 	productId := c.Param("productId")
 
 	var payload domain.ProductDTO
@@ -71,9 +72,4 @@ func (p controllerProduct) UpdateProduct(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, product)
 	return
-}
-
-func getUser(c *gin.Context) domain.LoggedUser {
-	loggedUser, _ := c.Get("loggedUser")
-	return loggedUser.(domain.LoggedUser)
 }

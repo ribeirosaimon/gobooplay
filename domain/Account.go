@@ -31,6 +31,11 @@ type Account struct {
 	UpdatedAt          time.Time          `json:"updatedAt" bson:"updatedAt"`
 }
 
+type AccountRef struct {
+	Name   string `json:"name"`
+	UserId string `json:"userId"`
+}
+
 type AccountDTO struct {
 	Login      string `json:"login"`
 	Password   string `json:"password"`
@@ -57,4 +62,8 @@ type UserAccessToken struct {
 func (a AccountDTO) cleanPassword() AccountDTO {
 	a.Password = ""
 	return a
+}
+
+func (a Account) MyRef() AccountRef {
+	return AccountRef{Name: a.Name, UserId: a.ID.Hex()}
 }
