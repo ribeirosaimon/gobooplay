@@ -54,6 +54,7 @@ func (p controllerProduct) DeleteProduct(c *gin.Context) {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
 		return
 	}
+	return
 }
 
 func (p controllerProduct) UpdateProduct(c *gin.Context) {

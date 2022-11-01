@@ -38,7 +38,16 @@ func (m MongoTemplateStruct[T]) FindById(ctx context.Context, s string) (T, erro
 	return m.myInterface, nil
 }
 
-func (m MongoTemplateStruct[T]) Find(ctx context.Context, filter bson.D) ([]T, error) {
+func (m MongoTemplateStruct[T]) FindOneByFilter(ctx context.Context, filter bson.D) (T, error) {
+
+	if err := m.database.FindOne(ctx, filter).Decode(&m.myInterface); err != nil {
+		return m.myInterface, err
+	}
+
+	return m.myInterface, nil
+}
+
+func (m MongoTemplateStruct[T]) FindAllByFilter(ctx context.Context, filter bson.D) ([]T, error) {
 	cur, err := m.database.Find(ctx, filter)
 	defer cur.Close(ctx)
 	if err != nil {

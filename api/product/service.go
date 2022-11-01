@@ -54,7 +54,7 @@ func (s productService) FindAllProduct(ctx context.Context, user domain.LoggedUs
 		filter = bson.D{{}}
 	}
 
-	find, err := s.productRepository.Find(ctx, filter)
+	find, err := s.productRepository.FindAllByFilter(ctx, filter)
 	if err != nil {
 		return []domain.ProductDTO{}, nil
 	}

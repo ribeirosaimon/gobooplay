@@ -11,7 +11,8 @@ var clientInstance *mongo.Client
 var mongoOnce sync.Once
 
 const (
-	CONNECTIONSTRING = "mongodb://saimon:frajolinha202@localhost:27017"
+	//CONNECTIONSTRING = "mongodb://saimon:frajolinha202@localhost:27017"
+	CONNECTIONSTRING = "mongodb://localhost:27017"
 	DB               = "gobooplay"
 )
 

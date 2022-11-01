@@ -32,8 +32,8 @@ type Account struct {
 }
 
 type AccountRef struct {
-	Name   string `json:"name"`
-	UserId string `json:"userId"`
+	Name   string `json:"name" bson:"name"`
+	UserId string `json:"userId" bson:"userId"`
 }
 
 type AccountDTO struct {

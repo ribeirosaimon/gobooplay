@@ -3,7 +3,6 @@ package shoppingCart
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/repository"
@@ -36,25 +35,53 @@ func (s shoppingCartService) saveShoppingCart(c context.Context, id string, logg
 	}
 
 	shoppingCartFilter := bson.D{
-		{"owner.userId", id},
+		{"owner.userId", loggedUser.UserId},
 	}
 
-	shoppingCart, err := s.shoppingCartRepository.Find(c, shoppingCartFilter)
-	if len(shoppingCart) != 0 {
+	shoppingCart, err := s.shoppingCartRepository.FindAllByFilter(c, shoppingCartFilter)
+	if len(shoppingCart) == 1 {
 		return domain.ShoppingCart{}, errors.New("you have a Shopping Cart")
 	}
-	var newShoppingCart domain.ShoppingCart
 
-	newShoppingCart.Owner = user.MyRef()
-	newShoppingCart.Hash = util.CreateHash()
-	fmt.Println(util.CreateHash())
-	newShoppingCart.CreatedAt = time.Now()
-	newShoppingCart.UpdateAt = time.Now()
-
-	find, err := s.productRepository.FindById(c, id)
+	productDb, err := s.productRepository.FindById(c, id)
 	if err != nil {
 		return domain.ShoppingCart{}, err
 	}
-	fmt.Println(find)
-	return domain.ShoppingCart{}, nil
+
+	var newShoppingCart domain.ShoppingCart
+	newShoppingCart.Owner = user.MyRef()
+	newShoppingCart.Hash = util.CreateHash()
+	newShoppingCart.CreatedAt = time.Now()
+	newShoppingCart.UpdateAt = time.Now()
+	newShoppingCart.Product = productDb
+	newShoppingCart.Price = productDb.Price
+
+	savedShoppingCart, err := s.shoppingCartRepository.Save(c, newShoppingCart)
+	if err != nil {
+		return domain.ShoppingCart{}, err
+	}
+
+	return savedShoppingCart, nil
+}
+
+func (s shoppingCartService) findShoppingCart(c context.Context, user domain.LoggedUser) (domain.ShoppingCart, error) {
+	filter := bson.D{
+		{"owner.userId", user.UserId},
+	}
+	cart, err := s.shoppingCartRepository.FindOneByFilter(c, filter)
+	if err != nil {
+		return domain.ShoppingCart{}, errors.New("you not have a shopping cart")
+	}
+	return cart, nil
+}
+
+func (s shoppingCartService) clearShoppingCart(c context.Context, user domain.LoggedUser) error {
+	cart, err := s.findShoppingCart(c, user)
+	if err != nil {
+		return err
+	}
+	if err := s.shoppingCartRepository.DeleteById(c, cart.ID.Hex()); err != nil {
+		return err
+	}
+	return nil
 }
