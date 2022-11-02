@@ -12,9 +12,9 @@ const (
 	TRIAL    = "TRIAL"
 )
 
-type MySubscription struct {
-	ID        primitive.ObjectID `json:"id" bson:"id,omitempty"`
-	User      AccountRef         `json:"user" bson:"user"`
+type Subscription struct {
+	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Owner     AccountRef         `json:"owner" bson:"owner"`
 	Product   Product            `json:"product" bson:"product"`
 	BegginAt  time.Time          `json:"startedAt" bson:"startedAt"`
 	EndAt     time.Time          `json:"endAt" bson:"endAt"`

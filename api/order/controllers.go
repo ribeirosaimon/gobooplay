@@ -2,11 +2,13 @@ package order
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"ribeirosaimon/gobooplay/exceptions"
 	"ribeirosaimon/gobooplay/util"
 )
 
 type controllerShoop struct {
-	service shoopService
+	service orderService
 }
 
 func ControllerShoop() controllerShoop {
@@ -16,5 +18,12 @@ func ControllerShoop() controllerShoop {
 }
 func (s controllerShoop) SendOrder(c *gin.Context) {
 	user := util.GetUser(c)
-	s.service.sendOrder(c, user)
+	order, err := s.service.sendOrder(c, user)
+	if err != nil {
+		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
+		return
+	}
+
+	c.JSON(http.StatusOK, order)
+	return
 }

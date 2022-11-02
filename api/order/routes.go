@@ -6,7 +6,7 @@ import (
 	"ribeirosaimon/gobooplay/middleware"
 )
 
-func RouteShoop(e *gin.RouterGroup) {
+func RouteOrder(e *gin.RouterGroup) {
 	group := e.Group("/order")
-	group.Use(middleware.Authorization([]string{domain.USER})).PUT("/send", ControllerShoop().SendOrder)
+	group.Use(middleware.Authorization([]string{domain.USER})).POST("/send", ControllerShoop().SendOrder)
 }

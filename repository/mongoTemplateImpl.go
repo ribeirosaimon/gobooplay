@@ -134,3 +134,11 @@ func (m MongoTemplateStruct[T]) ExistAndReturnId(ctx context.Context, id string)
 	}
 	return objectId, nil
 }
+
+func (m MongoTemplateStruct[T]) CountWithFilter(ctx context.Context, filter bson.D) (uint64, error) {
+	documents, err := m.database.CountDocuments(ctx, filter)
+	if err != nil {
+		return 0, err
+	}
+	return uint64(documents), nil
+}
