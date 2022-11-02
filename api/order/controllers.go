@@ -8,12 +8,12 @@ import (
 )
 
 type controllerShoop struct {
-	service orderService
+	service OrderService
 }
 
 func ControllerShoop() controllerShoop {
 	return controllerShoop{
-		service: ServiceShoop(),
+		service: ServiceOrder(),
 	}
 }
 func (s controllerShoop) SendOrder(c *gin.Context) {

@@ -28,7 +28,7 @@ func (s accountController) signUp(c *gin.Context) {
 		return
 	}
 
-	account, err := s.service.saveAccountService(ctx, payload)
+	account, err := s.service.saveAccount(ctx, payload)
 	if err != nil {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
 		return

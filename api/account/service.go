@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log"
+	"ribeirosaimon/gobooplay/api/order"
+	"ribeirosaimon/gobooplay/api/product"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/repository"
 	"ribeirosaimon/gobooplay/repository/mongoInterface"
@@ -12,15 +14,21 @@ import (
 )
 
 type accountService struct {
-	repository mongoInterface.Account
+	accountRepository mongoInterface.Account
+	subscripeService  order.OrderService
+	productService    product.ProductService
 }
 
 func service() accountService {
-	return accountService{repository: repository.NewAccountRepository()}
+	return accountService{
+		accountRepository: repository.NewAccountRepository(),
+		subscripeService:  order.ServiceOrder(),
+		productService:    product.ServiceProduct(),
+	}
 }
 
-func (s accountService) saveAccountService(ctx context.Context, dto domain.AccountDTO) (domain.AccountDTO, error) {
-	existUser := s.repository.ExistUserWithLogin(ctx, dto.Login)
+func (s accountService) saveAccount(ctx context.Context, dto domain.AccountDTO) (domain.AccountDTO, error) {
+	existUser := s.accountRepository.ExistUserWithLogin(ctx, dto.Login)
 	if existUser {
 		return domain.AccountDTO{}, errors.New("account already exists")
 	}
@@ -41,7 +49,16 @@ func (s accountService) saveAccountService(ctx context.Context, dto domain.Accou
 
 	newAccount.Password = string(encriptedPassword)
 
-	_, err = s.repository.Save(context.Background(), &newAccount)
+	account, err := s.accountRepository.Save(context.Background(), &newAccount)
+
+	firstProduct, err := s.productService.GetFirstProduct(ctx)
+	if err != nil {
+		return domain.AccountDTO{}, err
+	}
+	_, err = s.subscripeService.CreateOrder(ctx, account, firstProduct)
+	if err != nil {
+		return domain.AccountDTO{}, err
+	}
 	if err != nil {
 		return domain.AccountDTO{}, err
 	}
@@ -52,7 +69,7 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 	currentTime := time.Now()
 	var acessToken = domain.UserAccessToken{}
 
-	account, err := s.repository.FindAccountByLogin(ctx, login.Login)
+	account, err := s.accountRepository.FindAccountByLogin(ctx, login.Login)
 	if err != nil {
 		return acessToken, err
 	}
@@ -68,7 +85,7 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 	if err := security.VerifyPassword(account.Password, login.Password); err != nil {
 		account.LastLoginAttemp = currentTime
 		account.PasswordErrorCount += 1
-		_, err := s.repository.Save(ctx, &account)
+		_, err := s.accountRepository.Save(ctx, &account)
 		if err != nil {
 			return acessToken, err
 		}
@@ -79,7 +96,7 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 	account.LoginCount += 1
 	account.LastLogin = currentTime
 
-	s.repository.Save(ctx, &account)
+	s.accountRepository.Save(ctx, &account)
 
 	token, err := security.CreateToken(account)
 	if err != nil {

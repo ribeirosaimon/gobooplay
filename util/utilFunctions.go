@@ -4,10 +4,19 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"math/rand"
 	"ribeirosaimon/gobooplay/domain"
 	"time"
 )
+
+func GetInitialProductId() primitive.ObjectID {
+	hex, err := primitive.ObjectIDFromHex("000000000000000000000000")
+	if err != nil {
+		panic(err)
+	}
+	return hex
+}
 
 func GetUser(c *gin.Context) domain.LoggedUser {
 	loggedUser, _ := c.Get("loggedUser")

@@ -10,7 +10,7 @@ import (
 )
 
 type controllerProduct struct {
-	service productService
+	service ProductService
 }
 
 func ControllerProduct() controllerProduct {

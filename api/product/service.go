@@ -12,17 +12,24 @@ import (
 	"time"
 )
 
-type productService struct {
+type ProductService struct {
 	productRepository repository.MongoTemplateStruct[domain.Product]
 }
 
-func ServiceProduct() productService {
-	return productService{
+func ServiceProduct() ProductService {
+	return ProductService{
 		productRepository: repository.MongoTemplate[domain.Product](),
 	}
 }
+func (s ProductService) GetFirstProduct(c context.Context) (domain.Product, error) {
+	product, err := s.productRepository.FindById(c, util.GetInitialProductId().Hex())
+	if err != nil {
+		return domain.Product{}, err
+	}
+	return product, nil
+}
 
-func (s productService) AddProduct(ctx context.Context, payload domain.ProductDTO, user domain.LoggedUser) (domain.Product, error) {
+func (s ProductService) AddProduct(ctx context.Context, payload domain.ProductDTO, user domain.LoggedUser) (domain.Product, error) {
 	price, err := primitive.ParseDecimal128(payload.Price)
 	if err != nil {
 		return domain.Product{}, err
@@ -44,7 +51,7 @@ func (s productService) AddProduct(ctx context.Context, payload domain.ProductDT
 	return savedProduct, nil
 }
 
-func (s productService) FindAllProduct(ctx context.Context, user domain.LoggedUser) ([]domain.ProductDTO, error) {
+func (s ProductService) FindAllProduct(ctx context.Context, user domain.LoggedUser) ([]domain.ProductDTO, error) {
 	var filter bson.D
 	if util.ContainsRole[string](user.Role, domain.ADMIN) {
 		filter = bson.D{
@@ -73,7 +80,7 @@ func (s productService) FindAllProduct(ctx context.Context, user domain.LoggedUs
 	return sliceOfProduct, nil
 }
 
-func (s productService) DeleteProductById(ctx context.Context, id string, user domain.LoggedUser) error {
+func (s ProductService) DeleteProductById(ctx context.Context, id string, user domain.LoggedUser) error {
 	product, err := s.productRepository.FindById(ctx, id)
 	if err != nil {
 		return err
@@ -88,7 +95,7 @@ func (s productService) DeleteProductById(ctx context.Context, id string, user d
 	return nil
 }
 
-func (s productService) UpdateProduct(c *gin.Context, payload domain.ProductDTO, id string, user domain.LoggedUser) (domain.Product, error) {
+func (s ProductService) UpdateProduct(c *gin.Context, payload domain.ProductDTO, id string, user domain.LoggedUser) (domain.Product, error) {
 	product, err := s.productRepository.FindById(c, id)
 	if err != nil {
 		return domain.Product{}, err
