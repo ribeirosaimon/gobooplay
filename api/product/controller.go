@@ -19,7 +19,7 @@ func ControllerProduct() controllerProduct {
 	}
 }
 
-func (p controllerProduct) SaveProduct(c *gin.Context) {
+func (p controllerProduct) saveProduct(c *gin.Context) {
 	user := util.GetUser(c)
 
 	var payload domain.ProductDTO
@@ -47,7 +47,7 @@ func (p controllerProduct) FindAvailableProduct(c *gin.Context) {
 	return
 }
 
-func (p controllerProduct) DeleteProduct(c *gin.Context) {
+func (p controllerProduct) deleteProduct(c *gin.Context) {
 	user := util.GetUser(c)
 	productId := c.Param("productId")
 	if err := p.service.DeleteProductById(c, productId, user); err != nil {
@@ -57,7 +57,7 @@ func (p controllerProduct) DeleteProduct(c *gin.Context) {
 	return
 }
 
-func (p controllerProduct) UpdateProduct(c *gin.Context) {
+func (p controllerProduct) updateProduct(c *gin.Context) {
 	user := util.GetUser(c)
 	productId := c.Param("productId")
 

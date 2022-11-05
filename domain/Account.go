@@ -5,24 +5,15 @@ import (
 	"time"
 )
 
-const (
-	MALE gender = iota
-	FEMALE
-	GENERAL_ADMIN = "GENERAL_ADMIN"
-	ADMIN         = "ADMIN"
-	USER          = "USER"
-)
-
-type gender int
-
 type Account struct {
 	ID                 primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	Name               string             `json:"name" bson:"name"`
 	Password           string             `json:"password" bson:"password"`
 	FamilyName         string             `json:"familyName" bson:"familyName"`
-	Login              string             `json:"login"bson:"login"`
-	Gender             gender             `json:"gender"bson:"gender"`
-	Role               []string           `json:"role" bson:"role"`
+	Login              string             `json:"login" bson:"login"`
+	Gender             Gender             `json:"gender" bson:"gender"`
+	Status             Status             `json:"status" bson:"status"`
+	Role               []Role             `json:"role" bson:"role"`
 	LastLogin          time.Time          `json:"lastLogin" bson:"lastLogin"`
 	LastLoginAttemp    time.Time          `json:"lastLoginAttemp" bson:"lastLoginAttemp"`
 	PasswordErrorCount uint32             `json:"passwordErrorCount" bson:"passwordErrorCount"`
@@ -41,7 +32,7 @@ type AccountDTO struct {
 	Password   string `json:"password"`
 	Name       string `json:"name"`
 	FamilyName string `json:"familyName"`
-	Gender     gender `json:"gender"`
+	Gender     Gender `json:"gender"`
 }
 
 type LoginDTO struct {
@@ -50,9 +41,9 @@ type LoginDTO struct {
 }
 
 type LoggedUser struct {
-	Login  string   `json:"username" bson:"username"`
-	UserId string   `json:"userId" bson:"userId"`
-	Role   []string `json:"role" bson:"role"`
+	Login  string `json:"username" bson:"username"`
+	UserId string `json:"userId" bson:"userId"`
+	Role   []Role `json:"role" bson:"role"`
 }
 
 type UserAccessToken struct {

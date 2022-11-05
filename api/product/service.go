@@ -21,8 +21,12 @@ func ServiceProduct() ProductService {
 		productRepository: repository.MongoTemplate[domain.Product](),
 	}
 }
-func (s ProductService) GetFirstProduct(c context.Context) (domain.Product, error) {
-	product, err := s.productRepository.FindById(c, util.GetInitialProductId().Hex())
+
+func (s ProductService) GetTrialProduct(c context.Context) (domain.Product, error) {
+	filter := bson.D{
+		{"status", domain.TRIAL},
+	}
+	product, err := s.productRepository.FindOneByFilter(c, filter)
 	if err != nil {
 		return domain.Product{}, err
 	}
@@ -53,7 +57,7 @@ func (s ProductService) AddProduct(ctx context.Context, payload domain.ProductDT
 
 func (s ProductService) FindAllProduct(ctx context.Context, user domain.LoggedUser) ([]domain.ProductDTO, error) {
 	var filter bson.D
-	if util.ContainsRole[string](user.Role, domain.ADMIN) {
+	if util.ContainsRole[domain.Role](user.Role, domain.ADMIN) {
 		filter = bson.D{
 			{"updateBy.userId", user.UserId},
 		}

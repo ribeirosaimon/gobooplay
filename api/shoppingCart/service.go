@@ -25,7 +25,7 @@ func ServiceShoppingCart() shoppingCartService {
 }
 
 func (s shoppingCartService) saveShoppingCart(c context.Context, id string, loggedUser domain.LoggedUser) (domain.ShoppingCart, error) {
-	if !util.ContainsRole[string](loggedUser.Role, domain.USER) {
+	if !util.ContainsRole[domain.Role](loggedUser.Role, domain.USER) {
 		return domain.ShoppingCart{}, errors.New("you not have permission")
 	}
 

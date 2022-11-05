@@ -6,6 +6,7 @@ import (
 	"ribeirosaimon/gobooplay/api/order"
 	"ribeirosaimon/gobooplay/api/product"
 	"ribeirosaimon/gobooplay/api/shoppingCart"
+	"ribeirosaimon/gobooplay/api/subscription"
 )
 
 func CreateConfigRouter(e *gin.Engine) {
@@ -14,4 +15,5 @@ func CreateConfigRouter(e *gin.Engine) {
 	product.RouteProduct(version)
 	shoppingCart.RouteShoppingCart(version)
 	order.RouteOrder(version)
+	subscription.RouteSubscription(version)
 }

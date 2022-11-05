@@ -8,5 +8,5 @@ import (
 
 func RouteOrder(e *gin.RouterGroup) {
 	group := e.Group("/order")
-	group.Use(middleware.Authorization([]string{domain.USER})).POST("/send", ControllerShoop().SendOrder)
+	group.Use(middleware.Authorization([]domain.Role{domain.USER})).POST("/send", ControllerShoop().SendOrder)
 }

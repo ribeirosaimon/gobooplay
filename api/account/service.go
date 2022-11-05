@@ -3,9 +3,11 @@ package account
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"ribeirosaimon/gobooplay/api/order"
 	"ribeirosaimon/gobooplay/api/product"
+	"ribeirosaimon/gobooplay/api/subscription"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/repository"
 	"ribeirosaimon/gobooplay/repository/mongoInterface"
@@ -15,15 +17,17 @@ import (
 
 type accountService struct {
 	accountRepository mongoInterface.Account
-	subscripeService  order.OrderService
+	orderService      order.OrderService
 	productService    product.ProductService
+	subscribeService  subscription.SubscriptionService
 }
 
 func service() accountService {
 	return accountService{
 		accountRepository: repository.NewAccountRepository(),
-		subscripeService:  order.ServiceOrder(),
+		orderService:      order.ServiceOrder(),
 		productService:    product.ServiceProduct(),
+		subscribeService:  subscription.ServiceSubscription(),
 	}
 }
 
@@ -49,13 +53,13 @@ func (s accountService) saveAccount(ctx context.Context, dto domain.AccountDTO) 
 
 	newAccount.Password = string(encriptedPassword)
 
-	account, err := s.accountRepository.Save(context.Background(), &newAccount)
+	account, err := s.accountRepository.Save(ctx, &newAccount)
 
-	firstProduct, err := s.productService.GetFirstProduct(ctx)
+	firstProduct, err := s.productService.GetTrialProduct(ctx)
 	if err != nil {
 		return domain.AccountDTO{}, err
 	}
-	_, err = s.subscripeService.CreateOrder(ctx, account, firstProduct)
+	_, err = s.subscribeService.CreateSubscription(ctx, account, firstProduct)
 	if err != nil {
 		return domain.AccountDTO{}, err
 	}
@@ -104,4 +108,14 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 	}
 	acessToken.Token = token
 	return acessToken, nil
+}
+
+func (s accountService) avaliableSubscription(ctx context.Context, login domain.LoginDTO) error {
+	account, err := s.accountRepository.FindAccountByLogin(ctx, login.Login)
+	if err != nil {
+		return err
+	}
+	fmt.Println(account)
+	return nil
+
 }

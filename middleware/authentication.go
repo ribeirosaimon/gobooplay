@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func Authorization(roles []string) gin.HandlerFunc {
+func Authorization(roles []domain.Role) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		t := time.Now()
 		loggedUser, err := getToken(c)
@@ -44,7 +44,7 @@ func getToken(c *gin.Context) (domain.LoggedUser, error) {
 	return security.ValidationToken(token)
 }
 
-func contains(loggedUserRole, routeRole []string) bool {
+func contains(loggedUserRole, routeRole []domain.Role) bool {
 	for _, userRole := range loggedUserRole {
 
 		for _, role := range routeRole {

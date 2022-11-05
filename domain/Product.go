@@ -10,6 +10,7 @@ type Product struct {
 	Name             string               `json:"name" bson:"name"`
 	Price            primitive.Decimal128 `json:"price" bson:"price"`
 	SubscriptionTime uint8                `json:"subscriptionTime" bson:"subscriptionTime"`
+	Status           Status               `json:"status" bson:"status"`
 	CreatedAt        time.Time            `json:"createdAt" bson:"createdAt"`
 	UpdatedAt        time.Time            `json:"updatedAt" bson:"updatedAt"`
 	UpdateBy         LoggedUser           `json:"updateBy" bson:"updateBy"`
