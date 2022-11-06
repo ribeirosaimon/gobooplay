@@ -8,6 +8,7 @@ import (
 	"ribeirosaimon/gobooplay/api/product"
 	"ribeirosaimon/gobooplay/api/shoppingCart"
 	"ribeirosaimon/gobooplay/api/subscription"
+	"ribeirosaimon/gobooplay/api/voucher"
 )
 
 func CreateConfigRouter(e *gin.Engine) {
@@ -18,4 +19,5 @@ func CreateConfigRouter(e *gin.Engine) {
 	order.RouteOrder(version)
 	subscription.RouteSubscription(version)
 	movies.RouteMovie(version)
+	voucher.RouteVoucher(version)
 }
