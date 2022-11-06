@@ -58,3 +58,11 @@ func (a AccountDTO) cleanPassword() AccountDTO {
 func (a Account) MyRef() AccountRef {
 	return AccountRef{Name: a.Name, UserId: a.ID.Hex()}
 }
+
+func (a Account) GetLoggedUser() LoggedUser {
+	return LoggedUser{
+		Login:  a.Login,
+		UserId: a.ID.Hex(),
+		Role:   a.Role,
+	}
+}

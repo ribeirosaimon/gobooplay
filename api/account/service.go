@@ -48,8 +48,9 @@ func (s accountService) saveAccount(ctx context.Context, dto domain.AccountDTO) 
 	newAccount.FamilyName = dto.FamilyName
 	newAccount.Gender = dto.Gender
 	newAccount.Login = dto.Login
-	newAccount.Role = append(newAccount.Role, domain.ADMIN)
+	newAccount.Role = append(newAccount.Role, domain.USER)
 	newAccount.CreatedAt = time.Now()
+	newAccount.Status = domain.ACTIVE
 
 	newAccount.Password = string(encriptedPassword)
 
@@ -94,6 +95,15 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 			return acessToken, err
 		}
 		return acessToken, err
+	}
+
+	subs, err := s.subscribeService.FindSubscription(ctx, account.GetLoggedUser())
+	if err != nil {
+		return domain.UserAccessToken{}, err
+	}
+
+	if subs.Status == domain.PAUSE {
+		s.subscribeService.ActivateSubscription(ctx, account.GetLoggedUser())
 	}
 
 	account.PasswordErrorCount = 0

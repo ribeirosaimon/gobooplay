@@ -1,6 +1,7 @@
 package order
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"ribeirosaimon/gobooplay/domain"
@@ -35,7 +36,7 @@ func (s OrderService) sendOrder(c *gin.Context, loggedUser domain.LoggedUser) (d
 	}
 	shoppingCart, err := s.shoopingCartRepository.FindOneByFilter(c, userFilter)
 	if err != nil {
-		return domain.Subscription{}, err
+		return domain.Subscription{}, errors.New("you not have shopping cart")
 	}
 	product, err := s.productRepository.FindById(c, shoppingCart.Product.ID.Hex())
 	subsFilter := bson.D{
@@ -51,6 +52,7 @@ func (s OrderService) sendOrder(c *gin.Context, loggedUser domain.LoggedUser) (d
 
 	filterSaved := bson.D{
 		{"updatedAt", now},
+		{"product", product},
 		{"endAt", mySubs.EndAt.AddDate(0, int(product.SubscriptionTime), 0)},
 	}
 	mySubs, err = s.subscriptionRepository.UpdateById(c, mySubs.ID.Hex(), filterSaved)

@@ -29,6 +29,7 @@ func (s SubscriptionService) CreateSubscription(c context.Context, user domain.A
 	mySubs.Owner = user.MyRef()
 	mySubs.BegginAt = now
 	mySubs.EndAt = now.AddDate(0, int(product.SubscriptionTime), 0)
+	mySubs.Status = domain.ACTIVE
 	mySubs, err := s.subscriptionRepository.Save(c, mySubs)
 	if err != nil {
 		return domain.Subscription{}, err
@@ -36,7 +37,7 @@ func (s SubscriptionService) CreateSubscription(c context.Context, user domain.A
 	return mySubs, nil
 }
 
-func (s SubscriptionService) findSubscription(c context.Context, user domain.LoggedUser) (domain.Subscription, error) {
+func (s SubscriptionService) FindSubscription(c context.Context, user domain.LoggedUser) (domain.Subscription, error) {
 	filter := bson.D{
 		{"owner.userId", user.UserId},
 	}
@@ -47,14 +48,54 @@ func (s SubscriptionService) findSubscription(c context.Context, user domain.Log
 	return subs, nil
 }
 
+func (s SubscriptionService) PauseSubscription(c context.Context, user domain.LoggedUser) error {
+	subscription, err := s.FindSubscription(c, user)
+	if err != nil {
+		return err
+	}
+	now := time.Now()
+	subscription.PauseAt = now
+	rest := now.Sub(subscription.EndAt)
+	filter := bson.D{
+		{"restOfSubscription", rest},
+		{"pauseAt", now},
+		{"status", domain.PAUSE},
+	}
+
+	_, err = s.subscriptionRepository.UpdateById(c, subscription.ID.Hex(), filter)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s SubscriptionService) ValidateSubscription(c context.Context, user domain.LoggedUser) error {
-	subscription, err := s.findSubscription(c, user)
+	subscription, err := s.FindSubscription(c, user)
 	if err != nil {
 		return err
 	}
 	now := time.Now()
 	if now.After(subscription.EndAt) {
 		return errors.New("your subscribe is expired")
+	}
+	return nil
+}
+
+func (s SubscriptionService) ActivateSubscription(c context.Context, user domain.LoggedUser) error {
+	subscription, err := s.FindSubscription(c, user)
+	if err != nil {
+		return err
+	}
+
+	addDate := subscription.EndAt.Add(time.Duration(subscription.RestOfSubscription))
+	filter := bson.D{
+		{"endAt", addDate},
+		{"status", domain.ACTIVE},
+	}
+
+	_, err = s.subscriptionRepository.UpdateById(c, subscription.ID.Hex(), filter)
+	if err != nil {
+		return err
 	}
 	return nil
 }

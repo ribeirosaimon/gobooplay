@@ -16,6 +16,7 @@ func ControllerShoop() controllerShoop {
 		service: ServiceOrder(),
 	}
 }
+
 func (s controllerShoop) SendOrder(c *gin.Context) {
 	user := util.GetUser(c)
 	order, err := s.service.sendOrder(c, user)

@@ -5,9 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"ribeirosaimon/gobooplay/api/product"
+	"ribeirosaimon/gobooplay/api/subscription"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/repository"
 	"ribeirosaimon/gobooplay/routers"
+	"ribeirosaimon/gobooplay/security"
 	"time"
 )
 
@@ -19,7 +22,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	var product = domain.Product{
+	var pdt = domain.Product{
 		Name:             "trial",
 		Status:           domain.TRIAL,
 		Price:            decimal128,
@@ -35,7 +38,32 @@ func init() {
 		panic(err)
 	}
 	if exist == 0 {
-		mongoTemplate.Save(ctx, product)
+		mongoTemplate.Save(ctx, pdt)
+	}
+
+	mongoTemplateAccount := repository.MongoTemplate[domain.Account]()
+	accountFilter := bson.D{
+		{"role", domain.ADMIN},
+	}
+	countAdmin, err := mongoTemplateAccount.CountWithFilter(ctx, accountFilter)
+	if err != nil {
+		panic(err)
+	}
+	if countAdmin == 0 {
+		password, _ := security.EncriptyPassword("admin")
+		var acc = domain.Account{
+			Name:     "admin",
+			Password: string(password),
+			Login:    "admin",
+			Status:   domain.ACTIVE,
+		}
+		mongoTemplateAccount.Save(ctx, acc)
+		product.ServiceProduct().GetTrialProduct(ctx)
+		firstProduct, err := product.ServiceProduct().GetTrialProduct(ctx)
+		if err != nil {
+			panic(err)
+		}
+		subscription.ServiceSubscription().CreateSubscription(ctx, acc, firstProduct)
 	}
 }
 

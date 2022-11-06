@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"ribeirosaimon/gobooplay/api/account"
+	"ribeirosaimon/gobooplay/api/movies"
 	"ribeirosaimon/gobooplay/api/order"
 	"ribeirosaimon/gobooplay/api/product"
 	"ribeirosaimon/gobooplay/api/shoppingCart"
@@ -16,4 +17,5 @@ func CreateConfigRouter(e *gin.Engine) {
 	shoppingCart.RouteShoppingCart(version)
 	order.RouteOrder(version)
 	subscription.RouteSubscription(version)
+	movies.RouteMovie(version)
 }

@@ -72,14 +72,19 @@ func (s ProductService) FindAllProduct(ctx context.Context, user domain.LoggedUs
 	var sliceOfProduct []domain.ProductDTO
 
 	for _, product := range find {
-		var productConverter domain.ProductDTO
-		productConverter.ID = product.ID.Hex()
-		productConverter.Name = product.Name
-		productConverter.SubscriptionTime = product.SubscriptionTime
-		productConverter.Price = product.Price.String()
+		if product.Status != domain.TRIAL {
+			var productConverter domain.ProductDTO
+			productConverter.ID = product.ID.Hex()
+			productConverter.Name = product.Name
+			productConverter.SubscriptionTime = product.SubscriptionTime
+			productConverter.Price = product.Price.String()
 
-		sliceOfProduct = append(sliceOfProduct, productConverter)
-
+			sliceOfProduct = append(sliceOfProduct, productConverter)
+		}
+	}
+	if len(sliceOfProduct) == 0 {
+		emptySlice := make([]domain.ProductDTO, 0)
+		return emptySlice, nil
 	}
 	return sliceOfProduct, nil
 }

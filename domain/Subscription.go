@@ -6,12 +6,14 @@ import (
 )
 
 type Subscription struct {
-	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Owner     AccountRef         `json:"owner" bson:"owner"`
-	Product   Product            `json:"product" bson:"product"`
-	Status    Status             `json:"status" bson:"status"`
-	BegginAt  time.Time          `json:"startedAt" bson:"startedAt"`
-	EndAt     time.Time          `json:"endAt" bson:"endAt"`
-	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time          `json:"updatedAt" bson:"updatedAt"`
+	ID                 primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Owner              AccountRef         `json:"owner" bson:"owner"`
+	Product            Product            `json:"product" bson:"product"`
+	Status             Status             `json:"status" bson:"status"`
+	BegginAt           time.Time          `json:"startedAt" bson:"startedAt"`
+	EndAt              time.Time          `json:"endAt" bson:"endAt"`
+	RestOfSubscription float64            `json:"restOfSubscription" bson:"restOfSubscription"`
+	PauseAt            time.Time          `json:"pauseAt" bson:"pauseAt"`
+	CreatedAt          time.Time          `json:"createdAt" bson:"createdAt"`
+	UpdatedAt          time.Time          `json:"updatedAt" bson:"updatedAt"`
 }

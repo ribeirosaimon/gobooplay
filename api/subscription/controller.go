@@ -19,7 +19,7 @@ func ControllerProduct() controllerSubsription {
 
 func (s controllerSubsription) findMySubscription(c *gin.Context) {
 	user := util.GetUser(c)
-	subscription, err := s.service.findSubscription(c, user)
+	subscription, err := s.service.FindSubscription(c, user)
 	if err != nil {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
 		return
@@ -31,6 +31,17 @@ func (s controllerSubsription) findMySubscription(c *gin.Context) {
 func (s controllerSubsription) validationSubscription(c *gin.Context) {
 	user := util.GetUser(c)
 	if err := s.service.ValidateSubscription(c, user); err != nil {
+		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
+		return
+	}
+
+	c.JSON(http.StatusOK, "ok")
+	return
+}
+
+func (s controllerSubsription) pauseSubscription(c *gin.Context) {
+	user := util.GetUser(c)
+	if err := s.service.PauseSubscription(c, user); err != nil {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
 		return
 	}
