@@ -3,6 +3,8 @@ package subscription
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/repository"
@@ -98,4 +100,17 @@ func (s SubscriptionService) ActivateSubscription(c context.Context, user domain
 		return err
 	}
 	return nil
+}
+
+func (s SubscriptionService) getRestOfSubscription(c *gin.Context, user domain.LoggedUser) (error, string) {
+	subscription, err := s.FindSubscription(c, user)
+	if err != nil {
+		return err, ""
+	}
+
+	if subscription.Status == domain.PAUSE {
+		rest := time.Duration(subscription.RestOfSubscription)
+		return nil, fmt.Sprintf("You have: %f Days and %f Hours", rest.Hours()/24, rest.Hours())
+	}
+	return nil, ""
 }

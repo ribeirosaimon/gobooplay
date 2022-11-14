@@ -9,9 +9,9 @@ import (
 func RouteProduct(e *gin.RouterGroup) {
 	group := e.Group("/product")
 
-	group.Use(middleware.Authorization([]domain.Role{domain.ADMIN, domain.GENERAL_ADMIN, domain.USER})).
+	group.Use(middleware.Authorization([]domain.Role{domain.ADMIN, domain.USER})).
 		GET("/available-subscribe", ControllerProduct().FindAvailableProduct)
-	group.Use(middleware.Authorization([]domain.Role{domain.ADMIN, domain.GENERAL_ADMIN})).POST("/", ControllerProduct().saveProduct)
-	group.Use(middleware.Authorization([]domain.Role{domain.ADMIN, domain.GENERAL_ADMIN})).DELETE("/:productId", ControllerProduct().deleteProduct)
-	group.Use(middleware.Authorization([]domain.Role{domain.ADMIN, domain.GENERAL_ADMIN})).PUT("/:productId", ControllerProduct().updateProduct)
+	group.Use(middleware.Authorization([]domain.Role{domain.ADMIN})).POST("/", ControllerProduct().saveProduct)
+	group.Use(middleware.Authorization([]domain.Role{domain.ADMIN})).DELETE("/:productId", ControllerProduct().deleteProduct)
+	group.Use(middleware.Authorization([]domain.Role{domain.ADMIN})).PUT("/:productId", ControllerProduct().updateProduct)
 }

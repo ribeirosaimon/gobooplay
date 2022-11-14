@@ -43,6 +43,7 @@ func init() {
 
 	mongoTemplateAccount := repository.MongoTemplate[domain.Account]()
 	accountFilter := bson.D{
+		{"name", "initialAdmin"},
 		{"role", domain.ADMIN},
 	}
 	countAdmin, err := mongoTemplateAccount.CountWithFilter(ctx, accountFilter)
@@ -52,18 +53,23 @@ func init() {
 	if countAdmin == 0 {
 		password, _ := security.EncriptyPassword("admin")
 		var acc = domain.Account{
-			Name:     "admin",
+			Name:     "initialAdmin",
 			Password: string(password),
 			Login:    "admin",
 			Status:   domain.ACTIVE,
+			Role:     []domain.Role{domain.ADMIN},
 		}
-		mongoTemplateAccount.Save(ctx, acc)
+
+		saveAcc, err := mongoTemplateAccount.Save(ctx, acc)
+		if err != nil {
+			panic(err)
+		}
 		product.ServiceProduct().GetTrialProduct(ctx)
 		firstProduct, err := product.ServiceProduct().GetTrialProduct(ctx)
 		if err != nil {
 			panic(err)
 		}
-		subscription.ServiceSubscription().CreateSubscription(ctx, acc, firstProduct)
+		subscription.ServiceSubscription().CreateSubscription(ctx, saveAcc, firstProduct)
 	}
 }
 

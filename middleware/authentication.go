@@ -3,21 +3,18 @@ package middleware
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/exceptions"
 	"ribeirosaimon/gobooplay/security"
 	"strings"
-	"time"
 )
 
 func Authorization(roles []domain.Role) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		t := time.Now()
-		loggedUser, err := getToken(c)
+		loggedUser, err := getLoggedUser(c)
 		if err != nil {
-			exceptions.ValidateException(c, "no have token", http.StatusConflict)
+			exceptions.ValidateException(c, err.Error(), http.StatusConflict)
 			return
 		}
 		authorization := contains(loggedUser.Role, roles)
@@ -26,12 +23,10 @@ func Authorization(roles []domain.Role) gin.HandlerFunc {
 			return
 		}
 		c.Set("loggedUser", loggedUser)
-		latency := time.Since(t)
-		log.Println(latency)
 	}
 }
 
-func getToken(c *gin.Context) (domain.LoggedUser, error) {
+func getLoggedUser(c *gin.Context) (domain.LoggedUser, error) {
 	var token string
 	headerToken := c.GetHeader("Authorization")
 

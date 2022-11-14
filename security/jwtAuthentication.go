@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/repository"
@@ -38,22 +39,33 @@ func ValidationToken(token string) (domain.LoggedUser, error) {
 
 	parseToken, err := jwt.Parse(token, verifyKey)
 	if err != nil {
-		return domain.LoggedUser{}, err
+		return domain.LoggedUser{}, errors.New("invalid token")
 	}
 	claims, ok := parseToken.Claims.(jwt.MapClaims)
 
 	if ok && parseToken.Valid {
 		userId := claims["userId"]
-		rep := repository.NewAccountRepository()
-		userDb, err := rep.FindById(ctx, fmt.Sprint(userId))
+		exp := claims["exp"].(time.Time)ss
+		if exp.After(time.Now()) {
+			return domain.LoggedUser{}, errors.New("you token are expired")
+		}
+		accountRepository := repository.MongoTemplate[domain.Account]()
+		userDb, err := accountRepository.FindById(ctx, fmt.Sprint(userId))
 		if err != nil {
 			return domain.LoggedUser{}, err
 		}
-		return domain.LoggedUser{
+		user := domain.LoggedUser{
 			Login:  userDb.Login,
 			UserId: userDb.ID.Hex(),
 			Role:   userDb.Role,
-		}, nil
+		}
+		subscriptionRepository := repository.MongoTemplate[domain.Subscription]()
+		subs, err := subscriptionRepository.FindOneByFilter(ctx, bson.D{{"owner.userId", user.UserId}})
+		if err != nil || subs.Status == domain.PAUSE {
+			return domain.LoggedUser{}, errors.New("please activate your subscription")
+		}
+
+		return user, nil
 	}
 
 	return domain.LoggedUser{}, errors.New("invalid Token")

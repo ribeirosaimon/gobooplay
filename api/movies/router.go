@@ -8,5 +8,5 @@ import (
 
 func RouteMovie(e *gin.RouterGroup) {
 	group := e.Group("/movies")
-	group.Use(middleware.Authorization([]domain.Role{domain.USER})).GET("/", ControllerMovie().GetMovie)
+	group.Use(middleware.Authorization([]domain.Role{domain.USER, domain.ADMIN})).GET("/", ControllerMovie().GetMovie)
 }

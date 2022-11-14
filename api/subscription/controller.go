@@ -49,3 +49,15 @@ func (s controllerSubsription) pauseSubscription(c *gin.Context) {
 	c.JSON(http.StatusOK, "ok")
 	return
 }
+
+func (s controllerSubsription) restOfSubscription(c *gin.Context) {
+	user := util.GetUser(c)
+	err, duration := s.service.getRestOfSubscription(c, user)
+	if err != nil {
+		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
+		return
+	}
+
+	c.JSON(http.StatusOK, duration)
+	return
+}
