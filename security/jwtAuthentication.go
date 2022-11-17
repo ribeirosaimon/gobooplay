@@ -39,14 +39,15 @@ func ValidationToken(token string) (domain.LoggedUser, error) {
 
 	parseToken, err := jwt.Parse(token, verifyKey)
 	if err != nil {
-		return domain.LoggedUser{}, errors.New("invalid token")
+		return domain.LoggedUser{}, err
 	}
 	claims, ok := parseToken.Claims.(jwt.MapClaims)
 
 	if ok && parseToken.Valid {
 		userId := claims["userId"]
-		exp := claims["exp"].(time.Time)ss
-		if exp.After(time.Now()) {
+		timeout := claims["exp"].(float64)
+		t := time.Unix(int64(timeout), 0)
+		if time.Now().After(t) {
 			return domain.LoggedUser{}, errors.New("you token are expired")
 		}
 		accountRepository := repository.MongoTemplate[domain.Account]()
@@ -63,6 +64,9 @@ func ValidationToken(token string) (domain.LoggedUser, error) {
 		subs, err := subscriptionRepository.FindOneByFilter(ctx, bson.D{{"owner.userId", user.UserId}})
 		if err != nil || subs.Status == domain.PAUSE {
 			return domain.LoggedUser{}, errors.New("please activate your subscription")
+		}
+		if subs.EndAt.After(time.Now()) {
+			return domain.LoggedUser{}, errors.New("your subscription is over")
 		}
 
 		return user, nil

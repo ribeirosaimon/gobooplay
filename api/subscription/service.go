@@ -112,5 +112,10 @@ func (s SubscriptionService) getRestOfSubscription(c *gin.Context, user domain.L
 		rest := time.Duration(subscription.RestOfSubscription)
 		return nil, fmt.Sprintf("You have: %f Days and %f Hours", rest.Hours()/24, rest.Hours())
 	}
-	return nil, ""
+	until := time.Until(subscription.EndAt)
+	var days string
+	if until.Hours() <= 1 {
+		days = fmt.Sprintf("You have: %f Days and ", until.Hours()/24)
+	}
+	return nil, fmt.Sprintf("%s %f Hours", days, until.Hours())
 }
