@@ -45,7 +45,7 @@ func (s shoppingCartService) saveShoppingCart(c context.Context, id string, logg
 
 	productDb, err := s.productRepository.FindById(c, id)
 	if err != nil {
-		return domain.ShoppingCart{}, err
+		return domain.ShoppingCart{}, errors.New("product not found")
 	}
 
 	var newShoppingCart domain.ShoppingCart

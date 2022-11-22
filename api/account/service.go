@@ -76,7 +76,7 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 
 	account, err := s.accountRepository.FindAccountByLogin(ctx, login.Login)
 	if err != nil {
-		return acessToken, err
+		return acessToken, errors.New("this account not exist")
 	}
 
 	if account.PasswordErrorCount >= 10 {
@@ -92,9 +92,9 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 		account.PasswordErrorCount += 1
 		_, err := s.accountRepository.Save(ctx, &account)
 		if err != nil {
-			return acessToken, err
+			return acessToken, errors.New("incorrect password")
 		}
-		return acessToken, err
+		return acessToken, errors.New("incorrect password")
 	}
 
 	subs, err := s.subscribeService.FindSubscription(ctx, account.GetLoggedUser())
