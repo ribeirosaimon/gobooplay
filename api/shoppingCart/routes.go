@@ -9,6 +9,7 @@ import (
 func RouteShoppingCart(e *gin.RouterGroup) {
 	group := e.Group("/shopping-cart")
 	group.Use(middleware.Authorization([]domain.Role{domain.USER})).GET("/", ControllerProduct().GetMyShoppingCart)
-	group.Use(middleware.Authorization([]domain.Role{domain.USER})).POST("/:productId", ControllerProduct().SaveShoppingCart)
+	group.Use(middleware.Authorization([]domain.Role{domain.USER})).POST("product/:productId", ControllerProduct().SaveProductInShoppingCart)
+	group.Use(middleware.Authorization([]domain.Role{domain.USER})).POST("voucher/:voucherId", ControllerProduct().SaveVoucherInShoppingCart)
 	group.Use(middleware.Authorization([]domain.Role{domain.USER})).POST("/clear", ControllerProduct().ClearShoppingCart)
 }

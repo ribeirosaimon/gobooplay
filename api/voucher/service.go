@@ -92,3 +92,11 @@ func (s voucherService) updateVoucher(c *gin.Context, payload domain.VoucherDTO,
 	}
 	return response, nil
 }
+
+func (s voucherService) getVoucher(c context.Context, voucherId string) (domain.Voucher, error) {
+	voucher, err := s.voucherRepository.FindById(c, voucherId)
+	if err != nil {
+		return domain.Voucher{}, err
+	}
+	return voucher, nil
+}

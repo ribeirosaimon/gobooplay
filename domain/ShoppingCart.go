@@ -11,6 +11,7 @@ type ShoppingCart struct {
 	Product   Product              `json:"product" bson:"product"`
 	Price     primitive.Decimal128 `json:"price" bson:"price"`
 	Owner     AccountRef           `json:"owner" bson:"owner"`
+	Voucher   Voucher              `json:"voucher" bson:"voucher"`
 	CreatedAt time.Time            `json:"createdAt" bson:"createdAt"`
 	UpdateAt  time.Time            `json:"updateAt" bson:"updateAt"`
 }

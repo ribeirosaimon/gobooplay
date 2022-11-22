@@ -57,7 +57,7 @@ func (s SubscriptionService) PauseSubscription(c context.Context, user domain.Lo
 	}
 	now := time.Now()
 	subscription.PauseAt = now
-	rest := now.Sub(subscription.EndAt)
+	rest := subscription.EndAt.Sub(now)
 	filter := bson.D{
 		{"restOfSubscription", rest},
 		{"pauseAt", now},
@@ -89,7 +89,8 @@ func (s SubscriptionService) ActivateSubscription(c context.Context, user domain
 		return err
 	}
 
-	addDate := subscription.EndAt.Add(time.Duration(subscription.RestOfSubscription))
+	now := time.Now()
+	addDate := now.Add(time.Duration(subscription.RestOfSubscription))
 	filter := bson.D{
 		{"endAt", addDate},
 		{"status", domain.ACTIVE},

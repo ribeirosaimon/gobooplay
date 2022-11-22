@@ -64,7 +64,6 @@ func ValidationToken(token string) (domain.LoggedUser, error) {
 		subs, err := subscriptionRepository.FindOneByFilter(ctx, bson.D{{"owner.userId", user.UserId}})
 		if err != nil || subs.Status == domain.PAUSE {
 			return domain.LoggedUser{}, errors.New("please activate your subscription")
-			.
 		}
 		if subs.EndAt.Before(time.Now()) {
 			return domain.LoggedUser{}, errors.New("your subscription is over")

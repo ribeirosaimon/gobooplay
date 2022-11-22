@@ -63,3 +63,14 @@ func (s controllerVoucher) updateVoucher(c *gin.Context) {
 	c.JSON(http.StatusCreated, voucher)
 	return
 }
+
+func (s controllerVoucher) getVoucher(c *gin.Context) {
+	voucherId := c.Param("voucherId")
+	voucher, err := s.service.getVoucher(c, voucherId)
+	if err != nil {
+		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
+		return
+	}
+	c.JSON(http.StatusCreated, voucher)
+	return
+}

@@ -28,10 +28,22 @@ func (s controllerShoppingCart) GetMyShoppingCart(c *gin.Context) {
 	return
 }
 
-func (s controllerShoppingCart) SaveShoppingCart(c *gin.Context) {
+func (s controllerShoppingCart) SaveProductInShoppingCart(c *gin.Context) {
 	productId := c.Param("productId")
 	user := util.GetUser(c)
-	cart, err := s.service.saveShoppingCart(c, productId, user)
+	cart, err := s.service.saveProductShoppingCart(c, productId, user)
+	if err != nil {
+		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
+		return
+	}
+	c.JSON(http.StatusCreated, cart)
+	return
+}
+
+func (s controllerShoppingCart) SaveVoucherInShoppingCart(c *gin.Context) {
+	voucherId := c.Param("voucherId")
+	user := util.GetUser(c)
+	cart, err := s.service.saveVoucherShoppingCart(c, voucherId, user)
 	if err != nil {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
 		return
