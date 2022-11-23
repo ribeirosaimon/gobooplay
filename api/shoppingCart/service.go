@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/repository"
 	"ribeirosaimon/gobooplay/util"
@@ -59,6 +60,7 @@ func (s shoppingCartService) saveProductShoppingCart(c context.Context, id strin
 	newShoppingCart.UpdateAt = time.Now()
 	newShoppingCart.Product = productDb
 	newShoppingCart.Price = productDb.Price
+	newShoppingCart.FinalPrice = productDb.Price
 
 	savedShoppingCart, err := s.shoppingCartRepository.Save(c, newShoppingCart)
 	if err != nil {
@@ -76,7 +78,7 @@ func (s shoppingCartService) saveVoucherShoppingCart(
 		return domain.ShoppingCart{}, err
 	}
 	shoppingCartFilter := bson.D{
-		{"owner.userId", loggedUser.UserId},
+		{"owner.userId", user.ID.Hex()},
 	}
 
 	shoppingCart, err := s.shoppingCartRepository.FindOneByFilter(c, shoppingCartFilter)
@@ -89,10 +91,35 @@ func (s shoppingCartService) saveVoucherShoppingCart(
 		return domain.ShoppingCart{}, errors.New("product not found")
 	}
 
+	if voucherDb.Quantity == 0 {
+		return domain.ShoppingCart{}, errors.New("voucher is finish")
+	}
+
 	shoppingCart.Voucher = voucherDb
 
-	shoppingcartValue = primitive.Par
-	decimal.NewFromFloat()
+	promotionValue, err := decimal.NewFromString(shoppingCart.Price.String())
+	voucherValue, err := decimal.NewFromString(voucherDb.Price.String())
+	if err != nil {
+		return domain.ShoppingCart{}, err
+	}
+
+	promotion := promotionValue.Sub(voucherValue)
+	if promotion.IsNegative() {
+		decimal128, err := primitive.ParseDecimal128("0")
+		if err != nil {
+			return domain.ShoppingCart{}, err
+		}
+
+		shoppingCart.FinalPrice = decimal128
+	} else {
+		decimal128, err := primitive.ParseDecimal128(promotion.String())
+		if err != nil {
+			return domain.ShoppingCart{}, err
+		}
+
+		shoppingCart.FinalPrice = decimal128
+	}
+	return shoppingCart, nil
 }
 
 func (s shoppingCartService) findShoppingCart(c context.Context, user domain.LoggedUser) (domain.ShoppingCart, error) {

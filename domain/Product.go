@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
@@ -17,8 +18,8 @@ type Product struct {
 }
 
 type ProductDTO struct {
-	ID               string `json:"id,omitempty" bson:"_id,omitempty"`
-	Name             string `json:"name" bson:"name"`
-	Price            string `json:"price" bson:"price"`
-	SubscriptionTime uint8  `json:"subscriptionTime" bson:"subscriptionTime"`
+	ID               string          `json:"id,omitempty" bson:"_id,omitempty"`
+	Name             string          `json:"name" bson:"name"`
+	Price            decimal.Decimal `json:"price" bson:"price"`
+	SubscriptionTime uint8           `json:"subscriptionTime" bson:"subscriptionTime"`
 }

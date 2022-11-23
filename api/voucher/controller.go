@@ -3,6 +3,7 @@ package voucher
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"net/http"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/exceptions"
@@ -20,19 +21,25 @@ func ControllerVoucher() controllerVoucher {
 }
 
 func (s controllerVoucher) createVoucher(c *gin.Context) {
-	user := util.GetUser(c)
-
 	var payload domain.VoucherDTO
 	if err := json.NewDecoder(c.Request.Body).Decode(&payload); err != nil {
 		exceptions.ValidateException(c, "incorrect body", http.StatusConflict)
 		return
 	}
-	product, err := s.service.AddVoucher(c, payload, user)
+	product, err := s.service.AddVoucher(c, payload)
+	priceDecimal, err := decimal.NewFromString(product.Price.String())
 	if err != nil {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
 		return
 	}
-	c.JSON(http.StatusCreated, product)
+
+	var voucherDto = domain.VoucherDTO{
+		Name:        product.Name,
+		Description: product.Description,
+		Quantity:    product.Quantity,
+		Price:       priceDecimal.Truncate(2),
+	}
+	c.JSON(http.StatusCreated, voucherDto)
 	return
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ribeirosaimon/gobooplay/domain"
@@ -34,19 +35,20 @@ func (s ProductService) GetTrialProduct(c context.Context) (domain.Product, erro
 }
 
 func (s ProductService) AddProduct(ctx context.Context, payload domain.ProductDTO, user domain.LoggedUser) (domain.Product, error) {
-	price, err := primitive.ParseDecimal128(payload.Price)
+	var product domain.Product
+
+	decimal128, err := primitive.ParseDecimal128(payload.Price.String())
 	if err != nil {
 		return domain.Product{}, err
 	}
 
-	var product domain.Product
-
 	product.Name = payload.Name
-	product.Price = price
+	product.Price = decimal128
 	product.SubscriptionTime = payload.SubscriptionTime
 	product.CreatedAt = time.Now()
 	product.UpdatedAt = time.Now()
 	product.UpdateBy = user
+	product.Status = domain.ACTIVE
 
 	savedProduct, err := s.productRepository.Save(ctx, product)
 	if err != nil {
@@ -73,11 +75,16 @@ func (s ProductService) FindAllProduct(ctx context.Context, user domain.LoggedUs
 
 	for _, product := range find {
 		if product.Status != domain.TRIAL {
+			decimal128, err := decimal.NewFromString(product.Price.String())
+			if err != nil {
+				return []domain.ProductDTO{}, err
+			}
+
 			var productConverter domain.ProductDTO
 			productConverter.ID = product.ID.Hex()
 			productConverter.Name = product.Name
 			productConverter.SubscriptionTime = product.SubscriptionTime
-			productConverter.Price = product.Price.String()
+			productConverter.Price = decimal128
 
 			sliceOfProduct = append(sliceOfProduct, productConverter)
 		}
@@ -118,13 +125,8 @@ func (s ProductService) UpdateProduct(c *gin.Context, payload domain.ProductDTO,
 		filterBson = append(filterBson, bson.E{Key: "name", Value: payload.Name})
 	}
 
-	if payload.Price != "" {
-		priceDecimal, err := primitive.ParseDecimal128(payload.Price)
-
-		if err != nil {
-			return domain.Product{}, err
-		}
-		filterBson = append(filterBson, bson.E{Key: "price", Value: priceDecimal})
+	if payload.Price.Equal(decimal.Decimal{}) {
+		filterBson = append(filterBson, bson.E{Key: "price", Value: payload.Price})
 	}
 
 	if payload.SubscriptionTime != 0 {

@@ -17,11 +17,11 @@ import (
 func init() {
 	mongoTemplate := repository.MongoTemplate[domain.Product]()
 	ctx := context.Background()
-
 	decimal128, err := primitive.ParseDecimal128("0")
 	if err != nil {
 		panic(err)
 	}
+
 	var pdt = domain.Product{
 		Name:             "trial",
 		Status:           domain.TRIAL,

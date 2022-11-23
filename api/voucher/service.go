@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ribeirosaimon/gobooplay/domain"
@@ -21,18 +22,20 @@ func ServiceVoucher() voucherService {
 	}
 }
 
-func (s voucherService) AddVoucher(c context.Context, payload domain.VoucherDTO, user domain.LoggedUser) (domain.Voucher, error) {
-	price, err := primitive.ParseDecimal128(payload.Price)
-	if err != nil {
-		return domain.Voucher{}, err
-	}
+func (s voucherService) AddVoucher(c context.Context, payload domain.VoucherDTO) (domain.Voucher, error) {
 
 	var voucher domain.Voucher
 
+	decimal128, err := primitive.ParseDecimal128(payload.Price.String())
+
+	if err != nil {
+		return domain.Voucher{}, err
+	}
 	voucher.Name = payload.Name
-	voucher.Price = price
+	voucher.Price = decimal128
 	voucher.Status = domain.ACTIVE
 	voucher.Description = payload.Description
+	voucher.Quantity = payload.Quantity
 	voucher.CreatedAt = time.Now()
 	voucher.UpdatedAt = time.Now()
 
@@ -72,13 +75,8 @@ func (s voucherService) updateVoucher(c *gin.Context, payload domain.VoucherDTO,
 		filterBson = append(filterBson, bson.E{Key: "name", Value: payload.Name})
 	}
 
-	if payload.Price != "" {
-		priceDecimal, err := primitive.ParseDecimal128(payload.Price)
-
-		if err != nil {
-			return domain.Voucher{}, err
-		}
-		filterBson = append(filterBson, bson.E{Key: "price", Value: priceDecimal})
+	if payload.Price.Equal(decimal.Decimal{}) {
+		filterBson = append(filterBson, bson.E{Key: "price", Value: payload.Price})
 	}
 
 	if payload.Description != "" {
