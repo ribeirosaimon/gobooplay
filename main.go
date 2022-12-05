@@ -76,5 +76,6 @@ func init() {
 func main() {
 	r := gin.Default()
 	routers.CreateConfigRouter(r)
+
 	r.Run(":8080")
 }
