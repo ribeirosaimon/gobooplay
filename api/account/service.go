@@ -79,6 +79,9 @@ func (s accountService) login(ctx context.Context, login domain.LoginDTO) (domai
 		return acessToken, errors.New("this account not exist")
 	}
 
+	if account.Status == domain.DISABLED {
+		return domain.UserAccessToken{}, errors.New("your account is disabled")
+	}
 	if account.PasswordErrorCount >= 10 {
 		then := account.LastLoginAttemp.Add(time.Hour * 1)
 		before := currentTime.After(then)

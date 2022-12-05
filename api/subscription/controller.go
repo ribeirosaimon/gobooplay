@@ -57,7 +57,16 @@ func (s controllerSubsription) restOfSubscription(c *gin.Context) {
 		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
 		return
 	}
-
 	c.JSON(http.StatusOK, duration)
+	return
+}
+
+func (s controllerSubsription) cancelSubscription(c *gin.Context) {
+	user := util.GetUser(c)
+	if err := s.service.cancelSubscription(c, user); err != nil {
+		exceptions.ValidateException(c, err.Error(), http.StatusConflict)
+		return
+	}
+	c.JSON(http.StatusOK, "ok")
 	return
 }

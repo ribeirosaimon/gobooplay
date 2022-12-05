@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"ribeirosaimon/gobooplay/domain"
 	"ribeirosaimon/gobooplay/repository"
@@ -103,7 +102,7 @@ func (s SubscriptionService) ActivateSubscription(c context.Context, user domain
 	return nil
 }
 
-func (s SubscriptionService) getRestOfSubscription(c *gin.Context, user domain.LoggedUser) (error, string) {
+func (s SubscriptionService) getRestOfSubscription(c context.Context, user domain.LoggedUser) (error, string) {
 	subscription, err := s.FindSubscription(c, user)
 	if err != nil {
 		return err, ""
@@ -119,4 +118,19 @@ func (s SubscriptionService) getRestOfSubscription(c *gin.Context, user domain.L
 		days = fmt.Sprintf("You have: %f Days and ", until.Hours()/24)
 	}
 	return nil, fmt.Sprintf("%s %f Hours", days, until.Hours())
+}
+
+func (s SubscriptionService) cancelSubscription(c context.Context, user domain.LoggedUser) error {
+	subscription, err := s.FindSubscription(c, user)
+	if err != nil {
+		return err
+	}
+	filter := bson.D{
+		{"status", domain.DISABLED},
+	}
+	_, err = s.subscriptionRepository.UpdateById(c, subscription.ID.Hex(), filter)
+	if err != nil {
+		return err
+	}
+	return nil
 }
