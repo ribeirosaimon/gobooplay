@@ -22,16 +22,22 @@ go run main.go
 
 When you start the app you automatically create a trial subscription and an admin user: 
 
-Login: admin 
+```
+POST {{localHost}}/account/login
+```
+body:
+```
+{
+    "login":"admin",
+    "password":"admin"
+}
+```
 
-Password: admin 
-
- 
-
-You can create a voucher in admin folder in Postman 
+You can create a voucher in admin folder in Postman
 
 ```
 POST {{localHost}}/voucher
+Authorization Bearer token
 ```
 ```
 {
