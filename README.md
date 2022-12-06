@@ -268,3 +268,29 @@ response:
 }
 
 ```
+
+get rest of your subscription
+
+```
+GET {{localHost}}/subscription/rest
+
+response:
+"6556.875215 Hours"
+
+```
+Pause or Cancel your subscription:
+
+```
+POST {{localHost}}/subscription/pause
+DELETE {{localHost}}/subscription/cancel
+
+```
+when you cancel your subscription you only change status to DISABLED
+
+
+
+# if you have time in your subscription you can see all in platform:
+
+```
+GET {{localHost}}/movies
+```
