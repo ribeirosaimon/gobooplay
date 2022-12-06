@@ -18,7 +18,6 @@ go mod tidy
 
 ```
 go run main.go
-
 ```
 
 When you start the app you automatically create a trial subscription and an admin user: 
