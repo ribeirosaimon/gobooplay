@@ -29,3 +29,15 @@ Password: admin
  
 
 You can create a voucher in admin folder in Postman 
+
+```
+POST {{localHost}}/voucher
+```
+```
+{
+    "name": "VOUCHERTEST",
+    "price": 50.00,
+    "description": "first voucher teste",
+    "quantity":10
+}
+```
