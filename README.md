@@ -13,6 +13,15 @@ go mod tidy
 ```
 
 * after you configure postman files and do not forgot add enviroments
+if you don't have enviroments in postman you have to create 2 variables
+```
+variable: access_token
+initial value: ""
+
+variable: localHost
+initial value: http://localhost:8080/api/v1
+
+```
 
 * after run the api
 
