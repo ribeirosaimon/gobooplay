@@ -1,19 +1,18 @@
 # Gooboplay
 
-Hello evebody, my name is Saimon and I make this challange using Golang and MongoDb,
-this is a subscribe app like a stream platform, you want to buy a subscribe and use to see films. 
+Hello everybody, my name is Saimon and I did this challenge using Golang and MongoDB,
+this is a subscription service like a streaming platform such as Netflix. 
 
  
-## how i test this project?
+## How to run it
 
-* The first one you have to clone this project and command 
+* Download the go dependencies 
 
 ```
-go mod tidy
+go mod download
 ```
 
-* after you configure postman files and do not forgot add enviroments
-if you don't have enviroments in postman you have to create 2 variables
+* Configure the Postman, import the pre-configured [collection](Gooboplay.postman_collection.json) and create the variables below:
 ```
 variable: access_token
 initial value: ""
@@ -23,13 +22,13 @@ initial value: http://localhost:8080/api/v1
 
 ```
 
-* after run the api
+* Run the API
 
 ```
 go run main.go
 ```
 
-When you start the app you automatically create a trial subscription and an admin user: 
+An Admin account and a trial subscription are automatically created when the service starts, you can log in using the credentials below:
 
 ```
 POST {{localHost}}/account/login
@@ -41,7 +40,8 @@ body:
     "password":"admin"
 }
 ```
-is return:
+
+it will return an access token:
 
 ```
 {
@@ -49,6 +49,7 @@ is return:
 }
 
 ```
+
 You can create a voucher in admin folder in Postman
 
 ```
@@ -63,7 +64,9 @@ Authorization Bearer token
     "quantity":10
 }
 ```
+
 You can add products
+
 ```
 POST {{localHost}}/product
 Authorization Bearer token
@@ -75,24 +78,27 @@ Authorization Bearer token
     "subscriptionTime": 4
 }
 ```
+
 ps: subscriptionTime in Months
 
 or:
+
 ```
-PUT {{localHost}}/product/productId
+PUT {{localHost}}/product/:productId
 
 {
     "Name": "changed subscription",
     "price": 10.00,
     "subscriptionTime": 5
 }
-
-DELETE {{localHost}}/product/productId
+```
+```
+DELETE {{localHost}}/product/:productId
 ```
 
-## with User:
+## As User:
 
-you have to sign Up:
+you have to sign up:
 
 ```
 POST {{localHost}}/account/signup
@@ -107,7 +113,7 @@ POST {{localHost}}/account/signup
 
 ```
 
-first time you have to get product to save a shooping cart ( you have to save a single product with admin user):
+then you have to get all available products to save to a shopping cart ( before it, you have to save a single product as an admin user):
 
 ```
 GET {{localHost}}/product/available-subscribe
@@ -125,7 +131,7 @@ response:
 
 ```
 
-Save a product in shooping cart:
+Save a product in shopping cart:
 
 ```
 POST {{localHost}}/shopping-cart/product/638e6d0e7eb899746c627ca2
@@ -175,7 +181,7 @@ response
 }
 ```
 
-you can add a voucher, but only admin can make vouchers:
+you can create a voucher, but only admin can create vouchers:
 
 ```
 POST {{localHost}}/shopping-cart/voucher/638e6d177eb899746c627ca3
@@ -225,7 +231,7 @@ response
 }
 ```
 
-you can get or clean your shooping Cart
+you can get or clean your shopping cart
 
 ```
 GET {{localHost}}/shopping-cart
@@ -233,12 +239,13 @@ GET {{localHost}}/shopping-cart
 POST {{localHost}}/shopping-cart/clear
 ```
 
-for buy you have to send a order:
+to buy you have to send an order:
 
 ```
 POST {{localHost}}/order/send
 ```
-after this you buy a subscription, you have 1 trial month, if you want to see your subscription:
+
+then you can buy a subscription, the first month is trial (free), if you want to check your subscription:
 
 ```
 GET {{localHost}}/subscription
@@ -278,7 +285,7 @@ response:
 
 ```
 
-get rest of your subscription
+to check how much time left to your subscription expire
 
 ```
 GET {{localHost}}/subscription/rest
@@ -287,18 +294,18 @@ response:
 "6556.875215 Hours"
 
 ```
-Pause or Cancel your subscription:
+
+to pause or cancel your subscription:
 
 ```
 POST {{localHost}}/subscription/pause
 DELETE {{localHost}}/subscription/cancel
 
 ```
+
 when you cancel your subscription you only change status to DISABLED
 
-
-
-# if you have time in your subscription you can see all in platform:
+if you have time in your subscription you can see all in platform:
 
 ```
 GET {{localHost}}/movies
